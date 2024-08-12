@@ -8,6 +8,17 @@
 <META NAME="Description" CONTENT="a handmade love letter, one of a kind">
 <meta charset="UTF-8">
 <style>
+  @font-face {
+    font-family: 'Andalusia';
+    src: url('Andalusia.otf') format('opentype');
+}
+
+body {
+    font-family: 'Andalusia', 'Arial' , sans-serif;
+}
+
+
+
 html, body {
   height: 100%;
   padding: 0;
@@ -434,22 +445,31 @@ canvas {
  
        function renderText() {
          context.clearRect(0, 0, canvas.width, canvas.height);
+
+
+         var textWithFallback = function(text) {
+          // Check if the text contains special characters
+          return text.replace(/É/g, function(match) {
+              return "<span style='font-family: Arial;'>" + match + "</span>";
+          });
+      };
  
          // Render the main message
          context.fillStyle = "#9932CC"; // Purple color
          context.textAlign = "center";
-         context.font = "bold 48px Arial";
+         context.font = "bold 60px 'Andalusia'";
+         
          
          var currentText = words.slice(0, currentWordIndex + 1).join(" ");
          context.fillText(currentText, canvas.width / 2, canvas.height / 2-200);
  
          // Render the additional phrase directly below the main message
-         context.font = "bold 40px Arial"; // Increased font size
+         context.font = "bold 40px 'Andalusia'"; // Increased font size
          context.fillText("Wish You The Best Birthday Ever :3", canvas.width / 2, canvas.height / 2+220 ); // Adjust y position as needed
  
            // Render the additional phrase directly below the main message
-           context.font = "bold 20px Arial"; // Increased font size
-           context.fillText("Click bất kỳ để nghe nhạc nha :3", canvas.width / 2, canvas.height / 2+250 ); // Adjust y position as needed
+           context.font = "bold 25px 'Andalusia'"; // Increased font size
+           context.fillText("Click bất kỳ để nghe nhạc nha :3", canvas.width / 2, canvas.height / 2+280 ); // Adjust y position as needed
    
          // Update display time and logic
          messageDisplayTime += 1;

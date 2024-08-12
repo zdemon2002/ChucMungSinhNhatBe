@@ -457,9 +457,14 @@ var happyBirthdayAudio = document.getElementById('happyBirthdayAudio');
 
 // Function to play the audio
 function playHappyBirthday() {
-    happyBirthdayAudio.play();
+  if (happyBirthdayAudio.paused) {
+      happyBirthdayAudio.play().catch(error => {
+          console.log("Playback failed:", error);
+      });
+  } else {
+      happyBirthdayAudio.pause();
+  }
 }
-
 // Set the audio to loop indefinitely
 happyBirthdayAudio.loop = true;
 

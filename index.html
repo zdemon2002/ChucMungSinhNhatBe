@@ -5,7 +5,7 @@
 <META NAME="Generator" CONTENT="EditPlus">
 <META NAME="Author" CONTENT="Hien Duc Vu">
 <META NAME="Keywords" CONTENT="">
-<META NAME="Description" CONTENT="a handmade love letter,one of a kind">
+<META NAME="Description" CONTENT="a handmade love letter, one of a kind">
 <meta charset="UTF-8">
 <style>
 html, body {
@@ -36,19 +36,46 @@ canvas {
   left: 0;
   z-index: 2; /* Heart animation layer */
 }
+
+/* Added styles for background image animation */
+.background-images {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 0; /* Behind everything */
+  background-size: cover;
+  background-position: center;
+  animation: changeBackground 25s infinite; /* Change image every 5 seconds */
+}
+
+@keyframes changeBackground {
+  0% { background-image: url('image1.png'); }
+  20% { background-image: url('image2.png'); }
+  40% { background-image: url('image3.png'); }
+  60% { background-image: url('image4.png'); }
+  80% { background-image: url('image5.png'); }
+  100% { background-image: url('image1.png'); }
+}
 </style>
 </HEAD>
 <BODY>
+  <!-- Added background image container -->
+  <div class="background-images"></div>
+
   <!-- Container for tsParticles -->
   <div id="tsparticles"></div>
 
   <!-- Canvas for the heart animation -->
   <canvas id="pinkboard"></canvas>
 
+  <!-- Audio element for Happy Birthday song -->
+  <audio id="happyBirthdayAudio" src="happy_birthday.mp3" loop></audio>
+
   <!-- Include tsParticles script -->
   <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
-  <!-- Audio element for Happy Birthday song -->
-<audio id="happyBirthdayAudio" src="happy_birthday.mp3"></audio>
+  
   <script>
     tsParticles.load("tsparticles", {
       "fullScreen": {
@@ -182,11 +209,21 @@ canvas {
         },
         "shape": {
           "type": [
-            "circle",
-            "square"
+            "heart",
+            "heart"
           ],
           "options": {}
         }
+      }
+    });
+
+    // Play audio when the document is clicked
+    document.addEventListener('click', function() {
+      const audio = document.getElementById('happyBirthdayAudio');
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
       }
     });
   </script>
@@ -280,9 +317,10 @@ canvas {
     */
     var ParticlePool = (function() {
       var particles,
-          firstActive = 0,
-          firstFree   = 0,
-          duration    = settings.particles.duration;
+        firstActive = 0,
+        firstFree   = 0,
+        duration    = settings.particles.duration;
+
       function ParticlePool(length) {
         // create and populate particle pool
         particles = new Array(length);
@@ -291,14 +329,16 @@ canvas {
       }
       ParticlePool.prototype.add = function(x, y, dx, dy) {
         particles[firstFree].initialize(x, y, dx, dy);
+
         // handle circular queue
         firstFree++;
-        if (firstFree == particles.length) firstFree = 0;
-        if (firstActive == firstFree) firstActive++;
+        if (firstFree   == particles.length) firstFree   = 0;
+        if (firstActive == firstFree       ) firstActive++;
         if (firstActive == particles.length) firstActive = 0;
       };
       ParticlePool.prototype.update = function(deltaTime) {
         var i;
+
         // update active particles
         if (firstActive < firstFree) {
           for (i = firstActive; i < firstFree; i++)
@@ -310,6 +350,7 @@ canvas {
           for (i = 0; i < firstFree; i++)
             particles[i].update(deltaTime);
         }
+
         // remove inactive particles
         while (particles[firstActive].age >= duration && firstActive != firstFree) {
           firstActive++;
@@ -337,9 +378,10 @@ canvas {
     */
     (function(canvas) {
       var context = canvas.getContext('2d'),
-          particles = new ParticlePool(settings.particles.length),
-          particleRate = settings.particles.length / settings.particles.duration, // particles/sec
-          time;
+        particles = new ParticlePool(settings.particles.length),
+        particleRate = settings.particles.length / settings.particles.duration, // particles/sec
+        time;
+
       // get point on heart with -PI <= t <= PI
       function pointOnHeart(t) {
         return new Point(
@@ -347,12 +389,14 @@ canvas {
           130 * Math.cos(t) - 50 * Math.cos(2 * t) - 20 * Math.cos(3 * t) - 10 * Math.cos(4 * t) + 25
         );
       }
+
       // creating the particle image using a dummy canvas
       var image = (function() {
         var canvas  = document.createElement('canvas'),
-            context = canvas.getContext('2d');
+          context = canvas.getContext('2d');
         canvas.width  = settings.particles.size;
         canvas.height = settings.particles.size;
+
         // helper function to create the path
         function to(t) {
           var point = pointOnHeart(t);
@@ -360,6 +404,7 @@ canvas {
           point.y = settings.particles.size / 2 - point.y * settings.particles.size / 350;
           return point;
         }
+
         // create the path
         context.beginPath();
         var t = -Math.PI;
@@ -371,60 +416,67 @@ canvas {
           context.lineTo(point.x, point.y);
         }
         context.closePath();
+
         // create the fill
         context.fillStyle = '#9932CC';
         context.fill();
+
         // create the image
         var image = new Image();
         image.src = canvas.toDataURL();
         return image;
       })();
+       // render that thing!
+       var words = ["Happy", "Birthday", "Bé", "Vy"];
+       var currentWordIndex = 0;
+       var showFullMessage = false;
+       var messageDisplayTime = 0;
+ 
+       function renderText() {
+         context.clearRect(0, 0, canvas.width, canvas.height);
+ 
+         // Render the main message
+         context.fillStyle = "#9932CC"; // Purple color
+         context.textAlign = "center";
+         context.font = "bold 48px Arial";
+         
+         var currentText = words.slice(0, currentWordIndex + 1).join(" ");
+         context.fillText(currentText, canvas.width / 2, canvas.height / 2-200);
+ 
+         // Render the additional phrase directly below the main message
+         context.font = "bold 40px Arial"; // Increased font size
+         context.fillText("Wish You The Best Birthday Ever :3", canvas.width / 2, canvas.height / 2+220 ); // Adjust y position as needed
+ 
+           // Render the additional phrase directly below the main message
+           context.font = "bold 20px Arial"; // Increased font size
+           context.fillText("Click bất kỳ để nghe nhạc nha :3", canvas.width / 2, canvas.height / 2+250 ); // Adjust y position as needed
+   
+         // Update display time and logic
+         messageDisplayTime += 1;
+         if (messageDisplayTime >= 60) { // 1 second at 60fps
+           messageDisplayTime = 0;
+           currentWordIndex++;
+         }
+         
+         if (currentWordIndex >= words.length) {
+           showFullMessage = true;
+         }
+       }
+ 
+
       // render that thing!
-      var words = ["Happy", "Birthday", "Bé", "Vy"];
-      var currentWordIndex = 0;
-      var showFullMessage = false;
-      var messageDisplayTime = 0;
-
-      function renderText() {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Render the main message
-        context.fillStyle = "#9932CC"; // Purple color
-        context.textAlign = "center";
-        context.font = "bold 48px Arial";
-        
-        var currentText = words.slice(0, currentWordIndex + 1).join(" ");
-        context.fillText(currentText, canvas.width / 2, canvas.height / 2-200);
-
-        // Render the additional phrase directly below the main message
-        context.font = "bold 40px Arial"; // Increased font size
-        context.fillText("Wish You The Best Birthday Ever :3", canvas.width / 2, canvas.height / 2+220 ); // Adjust y position as needed
-
-          // Render the additional phrase directly below the main message
-          context.font = "bold 20px Arial"; // Increased font size
-          context.fillText("Click bất kỳ để nghe nhạc nha :3", canvas.width / 2, canvas.height / 2+250 ); // Adjust y position as needed
-  
-        // Update display time and logic
-        messageDisplayTime += 1;
-        if (messageDisplayTime >= 60) { // 1 second at 60fps
-          messageDisplayTime = 0;
-          currentWordIndex++;
-        }
-        
-        if (currentWordIndex >= words.length) {
-          showFullMessage = true;
-        }
-      }
-
       function render() {
         // next animation frame
         requestAnimationFrame(render);
+
         // update time
         var newTime   = new Date().getTime() / 1000,
-            deltaTime = newTime - (time || newTime);
+          deltaTime = newTime - (time || newTime);
         time = newTime;
+
         // clear canvas
         context.clearRect(0, 0, canvas.width, canvas.height);
+
         // create new particles
         var amount = particleRate * deltaTime;
         for (var i = 0; i < amount; i++) {
@@ -432,6 +484,7 @@ canvas {
           var dir = pos.clone().length(settings.particles.velocity);
           particles.add(canvas.width / 2 + pos.x, canvas.height / 2 - pos.y, dir.x, -dir.y);
         }
+
         // update and draw particles
         renderText();
         particles.update(deltaTime);
@@ -444,32 +497,13 @@ canvas {
         canvas.height = canvas.clientHeight;
       }
       window.onresize = onResize;
+
       // delay rendering bootstrap
       setTimeout(function() {
         onResize();
         render();
       }, 10);
     })(document.getElementById('pinkboard'));
-
-
-    // Get the audio element
-var happyBirthdayAudio = document.getElementById('happyBirthdayAudio');
-
-// Function to play the audio
-function playHappyBirthday() {
-  if (happyBirthdayAudio.paused) {
-      happyBirthdayAudio.play().catch(error => {
-          console.log("Playback failed:", error);
-      });
-  } else {
-      happyBirthdayAudio.pause();
-  }
-}
-// Set the audio to loop indefinitely
-happyBirthdayAudio.loop = true;
-
-// Add event listener to play audio on click
-document.addEventListener('click', playHappyBirthday);
   </script>
 </BODY>
 </HTML>
